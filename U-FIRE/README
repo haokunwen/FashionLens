@@ -1,1 +1,350 @@
+## General Data Notes
 
+* **Multi-Image Handling:** Many datasets contain one-to-many relationships (e.g., one query text to multiple target images).
+* **Training:** If the model cannot accept multiple images/inputs simultaneously, you should split the multi-target/multi-query entry into multiple distinct samples.
+* **Testing/Validation:** For standard evaluation, randomly sample **one** image to serve as the representative query/target for that instance.
+
+
+
+---
+
+### 1. Text→Image
+
+**Objective:** Retrieve target images based on a textual description.
+
+* **Datasets:**
+* **FashionGen:** One text query corresponds to multiple target images (different viewpoints).
+* *Note:* Train by splitting targets into individual samples. Test by sampling one target image.
+
+
+* **Shoes:** One text query corresponds to exactly one target image.
+
+
+
+**Data Format Example:**
+
+```json
+{
+    "id": "t2i_FashionGen_0000001",
+    "query_text": "relaxed-fit stretch cotton trousers featuring polygiene technology...",
+    "instruction_text": "search for images using the description text: relaxed-fit stretch...",
+    "target_image": [
+        "FashionGen_images/FashionGen_train_rawdata_0.jpg",
+        "FashionGen_images/FashionGen_train_rawdata_1.jpg",
+        "FashionGen_images/FashionGen_train_rawdata_2.jpg",
+        "FashionGen_images/FashionGen_train_rawdata_3.jpg"
+    ],
+    "task": "t2i",
+    "dataset": "FashionGen", // or "Shoes"
+    "split": "train" // "val", "test"
+}
+
+```
+
+---
+
+### 2. Sketch→Image
+
+**Objective:** Retrieve real product images using a hand-drawn sketch.
+
+* **Datasets:**
+* **ClothesV1:** 1-5 sketches (by different users) correspond to 1 target image.
+* *Note:* Train by splitting query sketches into individual samples. Test by sampling one sketch.
+
+
+* **HAIFashion:** 1 query sketch corresponds to 1 target image.
+* **QMUL-Shoe-V2:** Multiple query sketches correspond to 1 target image.
+* *Note:* Train by splitting query sketches. Test by sampling one sketch.
+
+
+
+
+
+**Data Format Example:**
+
+```json
+{
+    "id": "sketch2i_QMUL-Shoe-V2_0000001",
+    "query_image": [
+        "QMUL-Shoe-V2_images/trainA_2242561028_1.png",
+        "QMUL-Shoe-V2_images/trainA_2242561028_3.png",
+        "QMUL-Shoe-V2_images/trainA_2242561028_2.png"
+    ],
+    "instruction_text": "retrieve real images that resemble the sketch:",
+    "target_image": [
+        "QMUL-Shoe-V2_images/trainB_2242561028.png"
+    ],
+    "task": "sketch2i",
+    "dataset": "QMUL-Shoe-V2", // "ClothesV1", "HAIFashion"
+    "split": "train"
+}
+
+```
+
+---
+
+### 3. Street→Shop
+
+**Objective:** Retrieve clean in-shop product images based on street/selfie photos.
+
+* **Dataset:** **DeepFashion2** (Contains 2 sub-tasks):
+1. **One-to-Many:** 1 Query Image -> 1+ Target Images.
+2. **Many-to-Many:** Multiple Query Images -> 1+ Target Images.
+* *Note:* For training, split queries and targets into individual pairs. For testing, sample 1 image.
+
+
+
+
+
+**Data Format Example:**
+
+```json
+{
+    "id": "street2shop_Deepfashion2_0000004",
+    "query_image": [
+        "DeepFashion2_images/train+image+000003.jpg",
+        "DeepFashion2_images/train+image+000004.jpg",
+        "DeepFashion2_images/train+image+000005.jpg"
+    ],
+    "target_image": [
+        "DeepFashion2_images/train+image+000008.jpg"
+    ],
+    "instruction_text": "find images corresponding to the long sleeve dress in the user's photograph",
+    "dataset": "DeepFashion2",
+    "task": "street2shop-multi-query", // "street2shop-one-query"
+    "split": "train"
+}
+
+```
+
+---
+
+### 4. In-Shop
+
+**Objective:** High-quality image-to-image retrieval within a shop environment.
+
+* **Dataset:** **DeepFashion** (Contains 3 sub-tasks):
+1. **Multi-Try-On to Plain:** Query (multiple try-on photos) -> Target (1 plain product photo).
+* *Note:* Split query images for training if needed.
+
+
+2. **Plain to Multi-Try-On:** Query (1 plain product photo) -> Target (multiple try-on photos).
+* *Note:* Split target images for training if needed.
+
+
+3. **Similarity Retrieval:** Random query -> Multiple similar target images.
+* *Note:* Split target images for training if needed.
+
+
+
+
+
+**Data Format Example:**
+
+```json
+{
+    "id": "inshop_DeepFashion_0000001",
+    "query_image": [
+        "DeepFashion_images/DeepFashion+inshop+img+MEN+Tees_Tanks+id_00001774+28_6_flat.jpg"
+    ],
+    "target_image": [
+        "DeepFashion_images/img+MEN+Tees_Tanks+id_00001774+28_1_front.jpg",
+        "DeepFashion_images/img+MEN+Tees_Tanks+id_00001774+28_2_side.jpg",
+        "DeepFashion_images/img+MEN+Tees_Tanks+id_00001774+28_3_back.jpg",
+        "DeepFashion_images/img+MEN+Tees_Tanks+id_00001774+28_4_full.jpg"
+    ],
+    "instruction_text": "fetch images of this tees tanks being tried on",
+    "dataset": "DeepFashion",
+    "task": "inshop-tryon", // "inshop-plain", "inshop"
+    "split": "train"
+}
+
+```
+
+---
+
+### 5. Video→Image
+
+**Objective:** Retrieve a specific product image based on a video input.
+
+* **Dataset:** **MovingFashion**
+* **Constraint:** This task requires a model capable of processing video data.
+
+**Data Format Example:**
+
+```json
+{
+    "id": "video2img_MovingFashion_0000001",
+    "query_video": [
+        "MovingFashion_videos/videos+1046806_detail.mp4"
+    ],
+    "instruction_text": "retrieve images that match the main cloth from the video provided",
+    "target_image": [
+        "MovingFashion_images/imgs+1046806_in_xl.jpg"
+    ],
+    "task": "video2img",
+    "dataset": "MovingFashion",
+    "split": "train"
+}
+
+```
+
+---
+
+### 6. Sketch+Text→Image
+
+**Objective:** Retrieve real images based on a query consisting of both a sketch and a textual description.
+
+* **Dataset:** **CSTBIR**
+
+**Data Format Example:**
+
+```json
+{
+    "id": "sketch&text_CSTBIR_0000001",
+    "query_text": "a man wearing a gray provided sketch and gray pants.",
+    "query_image": [
+        "CSTBIR_images/QuickDraw+jacket+29901.jpg"
+    ],
+    "instruction_text": "retrieve real images that resemble the sketch matching the text: a man wearing a gray provided sketch and gray pants.",
+    "target_image": [
+        "CSTBIR_images/VG_images+VG_100K_2+1.jpg"
+    ],
+    "task": "sketch&text",
+    "dataset": "CSTBIR",
+    "split": "train"
+}
+
+```
+
+
+---
+
+### 7. Image+Modification Text→Image
+
+**Objective:** Retrieve images based on a visual query modified by a textual instruction (Image + Text -> Image).
+
+* **Datasets:**
+* **Fashion200K:** Modifications generated randomly (e.g., "replace A with B"). Consequently, multiple valid targets exist.
+* *Note:* Train by splitting targets. Test by sampling one.
+
+
+* **FashionIQ:** One-to-one mapping.
+* **Shoes:** One-to-one mapping.
+
+
+
+**Data Format Example:**
+
+```json
+{
+    "id": "cir_FashionIQ-Toptee_0000001",
+    "query_text": "has no sleeves and is light pink and pink",
+    "query_image": [
+        "FashionIQ_images/Toptee_images/toptee+train+B000FLD4AC.jpg"
+    ],
+    "instruction_text": "search for toptee images matching the text modifications of the given image: has no sleeves and is light pink and pink",
+    "target_image": [
+        "FashionIQ_images/Toptee_images/toptee+train+B005LUQ0FI.jpg"
+    ],
+    "task": "cir",
+    "dataset": "FashionIQ-Dress", // "FashionIQ-Shirt", "FashionIQ-Toptee", "Fashion200K", "Shoes"
+    "split": "train"
+}
+
+```
+
+
+---
+
+### 8. Image(s)→Compatible Item
+
+**Objective:** Suggest compatible items to complete an outfit.
+
+* **Datasets:**
+* **FashionVC:** One-to-one retrieval (e.g., Top -> Bottom). Queries target a specific category.
+* **Polyvore:** Outfit completion. Queries always target a specific category.
+* **Constraint:** Requires models capable of multi-image queries.
+* **Sampling Logic (by outfit size):**
+* *2-3 items:* Select each item once as target; remaining 1-2 items are query.
+* *4-6 items:* Select each item once as target (rest query). **Plus:** Randomly select 2 items as targets (rest query).
+* *7+ items:* Select each item once as target (rest query). **Plus:** Randomly select 4 items as targets (rest query).
+* *Note:* When training, consider sampling items from the same category as negative examples.
+
+
+
+
+
+
+
+**Data Format Example:**
+
+```json
+{
+    "id": "compatibility_Polyvore0000002",
+    "query_image": [
+        "Polyvore_images/top+119704139_1.jpg",
+        "Polyvore_images/skirt+119704139_3.jpg",
+        "Polyvore_images/shoes+119704139_4.jpg"
+    ],
+    "target_image": [
+        "Polyvore_images/outwear+119704139_2.jpg"
+    ],
+    "instruction_text": "find compatible outwear go well with the given images",
+    "dataset": "Polyvore", // "FashionVC"
+    "task": "compatibility-outwear",
+    "split": "train"
+}
+
+```
+
+
+
+---
+
+### 9. Image+Attribute→Image
+
+**Objective:** Retrieve images that share a specific attribute (e.g., gender, color) with the query image.
+
+* **Datasets:** **DARN**, **FashionAI**
+* **Logic:** Any image sharing the same attribute value is a valid target.
+* **Sampling:**
+* Positive Examples: 10 images sampled.
+* Negative Examples: 50 images sampled (same attribute category, different value).
+
+
+* **Candidate Data:** Validation and Test candidate pools (all candidates and label mappings) are stored in:
+* `9_asfr_xxx_val_candidate_data.json`
+* `9_asfr_xxx_test_candidate_data.json`
+
+
+
+**Data Format Example:**
+
+```json
+
+
+{
+    "id": "asfr_FashionAI_0000001",
+    "attribute": "sleeve length",
+    "query_image": [
+       "FashionAI_images/sleeve_length_labels+a9a911b18d9e082795057c2b7061b7d4.jpg"
+    ],
+    "instruction_text": "search for images with the same sleeve length with the provided image",
+    "target_image": [
+            "FashionAI_images/sleeve_length_labels+b03c786b367c664cd427ef42280b2649.jpg",
+            "FashionAI_images/sleeve_length_labels+80043b8ebb3945fc707dc804cd9f49e6.jpg",
+        // ... (up to 10 positives)
+    ],
+    "negative_image": [
+            "FashionAI_images/sleeve_length_labels+477dc969bd959010d90a1a6832ceeb9a.jpg",
+            "FashionAI_images/sleeve_length_labels+6a1184a1b3374902c402de67ef263233.jpg",
+        // ... (up to 50 negatives)
+    ],
+        "target_label": "FashionAI+sleeve length+extra long sleeves",
+        "task": "asfr",
+        "dataset": "FashionAI",
+        "split": "train"
+}
+
+```
