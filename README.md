@@ -17,7 +17,7 @@ In this work, we aim to develop a unified framework capable of handling diverse 
 This repository currently provides:
 
 - ✅ **Source code** — model implementation, training and evaluation scripts.
-- ✅ **Annotation files* — the metadata, splits, and task-level annotations used to construct the U-FIRE benchmark.
+- ✅ **Annotation files** — the metadata, splits, and task-level annotations used to construct the U-FIRE benchmark.
 
 The following will be released after the paper is accepted:
 
