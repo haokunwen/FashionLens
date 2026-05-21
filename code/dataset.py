@@ -390,7 +390,6 @@ class FashionCollator:
             
             dataset_names.append(sample['dataset'])
 
-        # PROCESS QUERY
         text_query = self.processor.apply_chat_template(query_messages, tokenize=False, add_generation_prompt=False)
         query_images, query_videos, query_video_kwargs = process_vision_info(query_messages, image_patch_size=16, return_video_kwargs=True, return_video_metadata=True)
         
@@ -402,7 +401,6 @@ class FashionCollator:
             
         query_inputs = self.processor(text=text_query, images=query_images, videos=query_videos, video_metadata=query_video_metadatas, return_tensors="pt", do_resize=False, **query_video_kwargs, padding=True)
 
-        # PROCESS TARGET
 
         text_target = self.processor.apply_chat_template(target_messages, tokenize=False, add_generation_prompt=False)
         target_images, target_videos, target_video_kwargs = process_vision_info(target_messages, image_patch_size=16, return_video_kwargs=True, return_video_metadata=True)
