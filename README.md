@@ -1,8 +1,8 @@
-# FashionLens: Versatile Fashion Image Retrieval via Task-Adaptive Learning
+# FashionLens: Toward Versatile Fashion Image Retrieval via Task-Adaptive Learning
 
 This repository contains the official code and data annotations for the paper:
 
-> **FashionLens: Versatile Fashion Image Retrieval via Task-Adaptive Learning**
+> **FashionLens: Toward Versatile Fashion Image Retrieval via Task-Adaptive Learning**
 
 ---
 
